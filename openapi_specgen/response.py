@@ -1,4 +1,4 @@
-from .utils import get_openapi_type
+from .utils import get_openapi_schema
 
 
 class OpenApiResponse():
@@ -23,20 +23,10 @@ class OpenApiResponse():
         if self.data_type is None:
             return openapi_dict
 
-        openapi_type = get_openapi_type(self.data_type)
+        openapi_dict[self.status_code]['content'] = {
+            self.http_content_type: {
+                'schema': get_openapi_schema(self.data_type)
+            }
+        }
 
-        if openapi_type == 'object':
-            openapi_dict[self.status_code]['content'] = {
-                self.http_content_type: {
-                    'schema': {
-                        '$ref': f'#/components/schemas/{self.data_type.__name__}'
-                    }
-                }
-            }
-        else:
-            openapi_dict[self.status_code]['content'] = {
-                self.http_content_type: {
-                    'schema': {'type': openapi_type}
-                }
-            }
         return openapi_dict
