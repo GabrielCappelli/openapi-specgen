@@ -21,7 +21,7 @@ def test_openapi():
                 'get': {
                     'description': '',
                     'summary': '',
-                    'operationId': '[get]_test_path',
+                    'operationId': '[get]_/test_path',
                     'responses': {
                         '200': {
                             'description': 'test_response',
