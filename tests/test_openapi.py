@@ -49,7 +49,7 @@ def test_openapi():
         'components': {
             'schemas': {
                 'TestObj': {
-                    'title': 'Testobj',
+                    'title': 'TestObj',
                     'required': ['int_field'],
                     'type': 'object',
                     'properties': {
