@@ -4,6 +4,8 @@ import pytest
 
 from openapi_specgen import OpenApiParam
 
+from .utils import SimpleObject
+
 
 @pytest.mark.parametrize('location', [
     ('query'),
@@ -74,6 +76,7 @@ def test_param_any_type():
     ({'type': 'number'}, List[float]),
     ({'type': 'boolean'}, List[bool]),
     ({'type': 'boolean'}, List[bool]),
+    ({'$ref': '#/components/schemas/SimpleObject'}, List[SimpleObject])
 ])
 def test_param_typed_list(openapi_item_type, data_type):
     expected_param_dict = {
