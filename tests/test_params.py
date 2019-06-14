@@ -5,7 +5,13 @@ import pytest
 from openapi_specgen import OpenApiParam
 
 
-def test_param_query():
+@pytest.mark.parametrize('location', [
+    ('query'),
+    ('path'),
+    ('header'),
+    ('cookie')
+])
+def test_param_location(location):
     expected_param_dict = {
         'required': True,
         'schema': {
@@ -13,23 +19,9 @@ def test_param_query():
             'type': 'string'
         },
         'name': 'test_param',
-        'in': 'query'
+        'in': location
     }
-    openapi_param = OpenApiParam('test_param', 'query', str)
-    assert expected_param_dict == openapi_param.as_dict()
-
-
-def test_param_path():
-    expected_param_dict = {
-        'required': True,
-        'schema': {
-            'title': 'Test_Param',
-            'type': 'string'
-        },
-        'name': 'test_param',
-        'in': 'path'
-    }
-    openapi_param = OpenApiParam('test_param', 'path', str)
+    openapi_param = OpenApiParam('test_param', location, str)
     assert expected_param_dict == openapi_param.as_dict()
 
 
@@ -75,33 +67,26 @@ def test_param_any_type():
     assert expected_param_dict == openapi_param.as_dict()
 
 
-def test_param_typed_list():
+@pytest.mark.parametrize('openapi_item_type, data_type', [
+    ({}, List),
+    ({'type': 'string'}, List[str]),
+    ({'type': 'integer'}, List[int]),
+    ({'type': 'number'}, List[float]),
+    ({'type': 'boolean'}, List[bool]),
+    ({'type': 'boolean'}, List[bool]),
+])
+def test_param_typed_list(openapi_item_type, data_type):
     expected_param_dict = {
         'required': True,
         'schema': {
             'title': 'Test_Param',
             'type': 'array',
-            'items': {'type': 'string'}
+            'items': openapi_item_type
         },
         'name': 'test_param',
         'in': 'path'
     }
-    openapi_param = OpenApiParam('test_param', 'path', List[str])
-    assert expected_param_dict == openapi_param.as_dict()
-
-
-def test_param_generic_list():
-    expected_param_dict = {
-        'required': True,
-        'schema': {
-            'title': 'Test_Param',
-            'type': 'array',
-            'items': {}
-        },
-        'name': 'test_param',
-        'in': 'path'
-    }
-    openapi_param = OpenApiParam('test_param', 'path', List)
+    openapi_param = OpenApiParam('test_param', 'path', data_type)
     assert expected_param_dict == openapi_param.as_dict()
 
 
