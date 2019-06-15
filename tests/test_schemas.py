@@ -4,7 +4,7 @@ import pytest
 
 from openapi_specgen.utils import get_openapi_schema
 
-from .utils import SimpleObject
+from .utils import DataclassObject
 
 
 @pytest.mark.parametrize('data_type, openapi_schema', [
@@ -12,9 +12,9 @@ from .utils import SimpleObject
     (int, {'type': 'integer'}),
     (float, {'type': 'number'}),
     (bool, {'type': 'boolean'}),
-    (SimpleObject, {'$ref': '#/components/schemas/SimpleObject'}),
+    (DataclassObject, {'$ref': '#/components/schemas/DataclassObject'}),
     (List, {'type': 'array', 'items': {}}),
-    (List[SimpleObject], {'type': 'array', 'items': {'$ref': '#/components/schemas/SimpleObject'}}),
+    (List[DataclassObject], {'type': 'array', 'items': {'$ref': '#/components/schemas/DataclassObject'}}),
     (List[str], {'type': 'array', 'items': {'type': 'string'}}),
     (List[int], {'type': 'array', 'items': {'type': 'integer'}}),
     (List[float], {'type': 'array', 'items': {'type': 'number'}}),

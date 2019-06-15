@@ -4,7 +4,7 @@ from typing import List
 
 from openapi_specgen import OpenApi, OpenApiParam, OpenApiPath, OpenApiResponse
 
-from .utils import SimpleObject
+from .utils import DataclassObject
 
 
 def test_openapi():
@@ -25,7 +25,7 @@ def test_openapi():
                             'description': 'test_response',
                             'content': {
                                 'application/json': {
-                                    'schema': {'$ref': '#/components/schemas/SimpleObject'}
+                                    'schema': {'$ref': '#/components/schemas/DataclassObject'}
                                 }
                             }
                         }
@@ -46,8 +46,8 @@ def test_openapi():
         },
         'components': {
             'schemas': {
-                'SimpleObject': {
-                    'title': 'SimpleObject',
+                'DataclassObject': {
+                    'title': 'DataclassObject',
                     'required': ['str_field', 'int_field', 'float_field', 'boolean_field', 'list_field'],
                     'type': 'object',
                     'properties': {
@@ -77,7 +77,7 @@ def test_openapi():
         }
     }
 
-    test_resp = OpenApiResponse('test_response', data_type=SimpleObject)
+    test_resp = OpenApiResponse('test_response', data_type=DataclassObject)
     test_param = OpenApiParam('test_param', 'query', data_type=str)
     test_path = OpenApiPath('/test_path', 'get', [test_resp], [test_param])
     test_api = OpenApi('test_api', [test_path])

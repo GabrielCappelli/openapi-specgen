@@ -4,7 +4,7 @@ import pytest
 
 from openapi_specgen import OpenApiParam
 
-from .utils import SimpleObject
+from .utils import DataclassObject
 
 
 @pytest.mark.parametrize('location', [

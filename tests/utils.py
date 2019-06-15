@@ -3,7 +3,7 @@ from typing import List
 
 
 @dataclass
-class SimpleObject():
+class DataclassObject():
     str_field: str
     int_field: int
     float_field: float

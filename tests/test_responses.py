@@ -2,7 +2,7 @@ import pytest
 
 from openapi_specgen import OpenApiResponse
 
-from .utils import SimpleObject
+from .utils import DataclassObject
 
 
 def test_response_primitive():
@@ -30,13 +30,13 @@ def test_response_object():
                 'application/json': {
                     'schema':
                     {
-                        '$ref': '#/components/schemas/SimpleObject'
+                        '$ref': '#/components/schemas/DataclassObject'
                     }
                 }
             }
         }
     }
-    openapi_response = OpenApiResponse('Test Response', data_type=SimpleObject)
+    openapi_response = OpenApiResponse('Test Response', data_type=DataclassObject)
     assert expected_openapi_dict == openapi_response.as_dict()
 
 
