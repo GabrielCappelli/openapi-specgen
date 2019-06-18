@@ -9,3 +9,9 @@ class DataclassObject():
     float_field: float
     boolean_field: bool
     list_field: List
+
+
+@dataclass
+class DataclassNestedObject():
+    str_field: str
+    nested_object: DataclassObject

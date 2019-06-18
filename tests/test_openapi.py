@@ -1,10 +1,7 @@
 
-from dataclasses import dataclass
-from typing import List
-
 from openapi_specgen import OpenApi, OpenApiParam, OpenApiPath, OpenApiResponse
 
-from .utils import DataclassObject
+from .utils import DataclassNestedObject
 
 
 def test_openapi():
@@ -25,7 +22,7 @@ def test_openapi():
                             'description': 'test_response',
                             'content': {
                                 'application/json': {
-                                    'schema': {'$ref': '#/components/schemas/DataclassObject'}
+                                    'schema': {'$ref': '#/components/schemas/DataclassNestedObject'}
                                 }
                             }
                         }
@@ -52,24 +49,33 @@ def test_openapi():
                     'type': 'object',
                     'properties': {
                         'str_field': {
-                            'title': 'Str_Field',
                             'type': 'string'
                         },
                         'int_field': {
-                            'title': 'Int_Field',
                             'type': 'integer'
                         },
                         'float_field': {
-                            'title': 'Float_Field',
                             'type': 'number'
                         },
                         'boolean_field': {
-                            'title': 'Boolean_Field',
                             'type': 'boolean'
                         },
                         'list_field': {
-                            'title': 'List_Field',
-                            'type': 'array'
+                            'type': 'array',
+                            'items': {}
+                        }
+                    }
+                },
+                'DataclassNestedObject': {
+                    'title': 'DataclassNestedObject',
+                    'required': ['str_field', 'nested_object'],
+                    'type': 'object',
+                    'properties': {
+                        'str_field': {
+                            'type': 'string'
+                        },
+                        'nested_object': {
+                            '$ref': '#/components/schemas/DataclassObject'
                         }
                     }
                 }
@@ -77,7 +83,7 @@ def test_openapi():
         }
     }
 
-    test_resp = OpenApiResponse('test_response', data_type=DataclassObject)
+    test_resp = OpenApiResponse('test_response', data_type=DataclassNestedObject)
     test_param = OpenApiParam('test_param', 'query', data_type=str)
     test_path = OpenApiPath('/test_path', 'get', [test_resp], [test_param])
     test_api = OpenApi('test_api', [test_path])

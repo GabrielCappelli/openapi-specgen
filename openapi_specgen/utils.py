@@ -50,19 +50,20 @@ def get_openapi_schema(data_type: type, reference=True) -> dict:
             return {
                 '$ref': f'#/components/schemas/{data_type.__name__}'
             }
-        return {
+        openapi_schema = {
             data_type.__name__: {
                 'title': data_type.__name__,
                 'required': [field.name for field in fields(data_type)],
                 'type': 'object',
                 'properties': {
-                    field.name: {
-                        'title': field.name.title(),
-                        'type': get_openapi_type(field.type)
-                    } for field in fields(data_type)
+                    field.name: get_openapi_schema(field.type) for field in fields(data_type)
                 }
             }
         }
+        for field in fields(data_type):
+            if get_openapi_type(field.type) == 'object':
+                openapi_schema.update(get_openapi_schema(field.type, reference=False))
+        return openapi_schema
     if openapi_type == 'array':
         return get_openapi_array_schema(data_type)
     return {'type': openapi_type}

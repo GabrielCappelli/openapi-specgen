@@ -37,12 +37,14 @@ class OpenApi():
 
             for param in openapi_path.params:
                 if get_openapi_type(param.data_type) == 'object':
-                    openapi_dict['components']['schemas'] = get_openapi_schema(
-                        param.data_type, reference=False)
+                    openapi_dict['components']['schemas'].update(
+                        get_openapi_schema(param.data_type, reference=False)
+                    )
 
             for resp in openapi_path.responses:
                 if get_openapi_type(resp.data_type) == 'object':
-                    openapi_dict['components']['schemas'] = get_openapi_schema(
-                        resp.data_type, reference=False)
+                    openapi_dict['components']['schemas'].update(
+                        get_openapi_schema(resp.data_type, reference=False)
+                    )
 
         return openapi_dict
