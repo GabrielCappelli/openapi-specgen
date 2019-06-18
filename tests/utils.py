@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import List
 
+from marshmallow import Schema, fields
+
 
 @dataclass
 class DataclassObject():
@@ -15,3 +17,11 @@ class DataclassObject():
 class DataclassNestedObject():
     str_field: str
     nested_object: DataclassObject
+
+
+class MarshmallowSchema(Schema):
+    str_field = fields.String(required=True)
+    int_field = fields.Integer()
+    float_field = fields.Float()
+    boolean_field = fields.Boolean()
+    list_field = fields.List(fields.String())
