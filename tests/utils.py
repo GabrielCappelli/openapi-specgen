@@ -25,3 +25,13 @@ class MarshmallowSchema(Schema):
     float_field = fields.Float()
     boolean_field = fields.Boolean()
     list_field = fields.List(fields.String())
+
+
+class MarshmallowNestedSchema(Schema):
+    str_field = fields.String(required=True)
+    int_field = fields.Integer()
+    float_field = fields.Float()
+    boolean_field = fields.Boolean()
+    list_field = fields.List(fields.String())
+    nested_schema = fields.Nested('MarshmallowSchema')
+    self_reference = fields.Nested('MarshmallowNestedSchema')

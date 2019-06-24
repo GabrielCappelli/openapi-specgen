@@ -65,22 +65,23 @@ def get_openapi_schema_from_dataclass(data_type: type) -> dict:
 def get_openapi_schema_from_marshmallow_field(marshmallow_field: marshmallow.fields.Field) -> dict:
 
     if isinstance(marshmallow_field, marshmallow.fields.Nested):
-        raise NotImplementedError('Nested marshmallow schemas are not yet implemented')
+        if isinstance(marshmallow_field.nested, str):
+            return {'$ref': f'#/components/schemas/{marshmallow_field.nested}'}
+        else:
+            return {'$ref': f'#/components/schemas/{marshmallow_field.nested.__name__}'}
     if isinstance(marshmallow_field, marshmallow.fields.String):
-        openapi_dict = {'type': 'string'}
+        return {'type': 'string'}
     if isinstance(marshmallow_field, marshmallow.fields.Boolean):
-        openapi_dict = {'type': 'boolean'}
+        return {'type': 'boolean'}
     if isinstance(marshmallow_field, marshmallow.fields.Integer):
-        openapi_dict = {'type': 'integer'}
+        return {'type': 'integer'}
     if isinstance(marshmallow_field, marshmallow.fields.Float):
-        openapi_dict = {'type': 'number'}
+        return {'type': 'number'}
     if isinstance(marshmallow_field, marshmallow.fields.List):
-        openapi_dict = {
+        return {
             'type': 'array',
             'items': get_openapi_schema_from_marshmallow_field(marshmallow_field.container)
         }
-
-    return openapi_dict
 
 
 def get_openapi_schema_from_mashmallow_schema(data_type: type) -> dict:
@@ -95,9 +96,13 @@ def get_openapi_schema_from_mashmallow_schema(data_type: type) -> dict:
                 }
             }
         }
-        for name, field in data_type._declared_fields.items():
+        for _, field in data_type._declared_fields.items():
             if isinstance(field, marshmallow.fields.Nested):
-                openapi_schema.update(get_openapi_schema_from_mashmallow_schema(field))
+                nested_schema = field.nested
+                if isinstance(nested_schema, str):
+                    nested_schema = marshmallow.class_registry.get_class(nested_schema)
+                if nested_schema.__name__ not in openapi_schema.keys():
+                    openapi_schema.update(get_openapi_schema_from_mashmallow_schema(nested_schema))
         return openapi_schema
 
 
