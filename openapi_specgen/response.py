@@ -1,4 +1,4 @@
-from .utils import get_openapi_schema
+from .schema import get_openapi_schema
 
 
 class OpenApiResponse():

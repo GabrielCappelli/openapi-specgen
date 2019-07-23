@@ -2,7 +2,7 @@ from typing import List
 
 from .param import OpenApiParam
 from .response import OpenApiResponse
-from .utils import get_openapi_schema
+from .schema import get_openapi_schema
 
 
 class OpenApiPath():

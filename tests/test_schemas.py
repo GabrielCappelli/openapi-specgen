@@ -2,7 +2,7 @@ from typing import List
 
 import pytest
 
-from openapi_specgen.utils import get_openapi_schema
+from openapi_specgen.schema import get_openapi_schema
 
 from .utils import (DataclassNestedObject, DataclassObject,
                     MarshmallowNestedSchema, MarshmallowSchema)

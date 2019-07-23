@@ -1,7 +1,7 @@
 from typing import List
 
 from .path import OpenApiPath
-from .utils import get_openapi_schema, get_openapi_type
+from .schema import get_openapi_schema, get_openapi_type
 
 
 class OpenApi():
