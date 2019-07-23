@@ -2,6 +2,7 @@ from typing import List
 
 from .param import OpenApiParam
 from .response import OpenApiResponse
+from .utils import get_openapi_schema
 
 
 class OpenApiPath():
@@ -13,6 +14,7 @@ class OpenApiPath():
                  params: List[OpenApiParam] = [],
                  descr: str = '',
                  summary: str = '',
+                 request_body=None,
                  ):
         self.path = path
         self.method = method
@@ -20,9 +22,10 @@ class OpenApiPath():
         self.params = params
         self.summary = summary
         self.descr = descr
+        self.request_body = request_body
 
     def as_dict(self):
-        return {
+        openapi_dict = {
             self.path: {
                 self.method: {
                     'description': self.descr,
@@ -37,3 +40,12 @@ class OpenApiPath():
                 }
             }
         }
+        if self.request_body is not None:
+            openapi_dict[self.path][self.method]['requestBody'] = {
+                'content': {
+                    'application/json': {
+                        'schema': get_openapi_schema(self.request_body)
+                    }
+                }
+            }
+        return openapi_dict
