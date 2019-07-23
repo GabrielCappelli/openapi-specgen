@@ -108,7 +108,7 @@ def test_openapi_with_marshmallow():
                             'description': 'test_response',
                             'content': {
                                 'application/json': {
-                                    'schema': {'$ref': '#/components/schemas/MarshmallowSchema'}
+                                    'schema': {'$ref': '#/components/schemas/Marshmallow'}
                                 }
                             }
                         }
@@ -129,8 +129,8 @@ def test_openapi_with_marshmallow():
         },
         'components': {
             'schemas': {
-                'MarshmallowSchema': {
-                    'title': 'MarshmallowSchema',
+                'Marshmallow': {
+                    'title': 'Marshmallow',
                     'required': ['str_field'],
                     'type': 'object',
                     'properties': {

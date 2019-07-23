@@ -97,8 +97,8 @@ def test_dataclass_nested_objects():
 
 def test_marshmallow_schema():
     expected_openapi_schema = {
-        'MarshmallowSchema': {
-            'title': 'MarshmallowSchema',
+        'Marshmallow': {
+            'title': 'Marshmallow',
             'type': 'object',
             'required':
             [
@@ -118,8 +118,8 @@ def test_marshmallow_schema():
 
 def test_marshmallow_nested_schema():
     expected_openapi_schema = {
-        'MarshmallowSchema': {
-            'title': 'MarshmallowSchema',
+        'Marshmallow': {
+            'title': 'Marshmallow',
             'type': 'object',
             'required':
             [
@@ -133,8 +133,8 @@ def test_marshmallow_nested_schema():
                 'list_field': {'type': 'array', 'items': {'type': 'string'}}
             }
         },
-        'MarshmallowNestedSchema': {
-            'title': 'MarshmallowNestedSchema',
+        'MarshmallowNested': {
+            'title': 'MarshmallowNested',
             'type': 'object',
             'required':
             [
@@ -146,8 +146,8 @@ def test_marshmallow_nested_schema():
                 'float_field': {'type': 'number'},
                 'boolean_field': {'type': 'boolean'},
                 'list_field': {'type': 'array', 'items': {'type': 'string'}},
-                'nested_schema': {'$ref': '#/components/schemas/MarshmallowSchema'},
-                'self_reference': {'$ref': '#/components/schemas/MarshmallowNestedSchema'}
+                'nested_schema': {'$ref': '#/components/schemas/Marshmallow'},
+                'self_reference': {'$ref': '#/components/schemas/MarshmallowNested'}
             }
         }
     }

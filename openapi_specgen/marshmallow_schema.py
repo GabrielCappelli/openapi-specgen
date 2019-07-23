@@ -5,9 +5,9 @@ def get_openapi_schema_from_marshmallow_field(marshmallow_field: marshmallow.fie
 
     if isinstance(marshmallow_field, marshmallow.fields.Nested):
         if isinstance(marshmallow_field.nested, str):
-            return {'$ref': f'#/components/schemas/{marshmallow_field.nested}'}
+            return {'$ref': f'#/components/schemas/{strip_schema_from_name(marshmallow_field.nested)}'}
         else:
-            return {'$ref': f'#/components/schemas/{marshmallow_field.nested.__name__}'}
+            return {'$ref': f'#/components/schemas/{strip_schema_from_name(marshmallow_field.nested.__name__)}'}
     if isinstance(marshmallow_field, marshmallow.fields.String):
         return {'type': 'string'}
     if isinstance(marshmallow_field, marshmallow.fields.Boolean):
@@ -23,11 +23,14 @@ def get_openapi_schema_from_marshmallow_field(marshmallow_field: marshmallow.fie
         }
 
 
-def get_openapi_schema_from_mashmallow_schema(data_type: type) -> dict:
+def get_openapi_schema_from_mashmallow_schema(data_type: type, reference=True) -> dict:
+    class_name = strip_schema_from_name(data_type.__name__)
+    if reference:
+        return {'$ref': f'#/components/schemas/{class_name}'}
     if issubclass(data_type, marshmallow.Schema):
         openapi_schema = {
-            data_type.__name__: {
-                'title': data_type.__name__,
+            class_name: {
+                'title': class_name,
                 'required': [name for name, field in data_type._declared_fields.items() if field.required],
                 'type': 'object',
                 'properties': {
@@ -40,6 +43,11 @@ def get_openapi_schema_from_mashmallow_schema(data_type: type) -> dict:
                 nested_schema = field.nested
                 if isinstance(nested_schema, str):
                     nested_schema = marshmallow.class_registry.get_class(nested_schema)
-                if nested_schema.__name__ not in openapi_schema.keys():
-                    openapi_schema.update(get_openapi_schema_from_mashmallow_schema(nested_schema))
+                if strip_schema_from_name(nested_schema.__name__) not in openapi_schema.keys():
+                    openapi_schema.update(get_openapi_schema_from_mashmallow_schema(
+                        nested_schema, reference=reference))
         return openapi_schema
+
+
+def strip_schema_from_name(name: str) -> str:
+    return name[:-6] if name.endswith('Schema') else name

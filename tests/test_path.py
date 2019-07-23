@@ -76,7 +76,7 @@ def test_path_with_request_body():
                     'content': {
                         'application/json': {
                             'schema': {
-                                '$ref': '#/components/schemas/MarshmallowSchema'
+                                '$ref': '#/components/schemas/Marshmallow'
                             }
                         }
                     }

@@ -42,12 +42,13 @@ def get_openapi_array_schema(array_type: type) -> dict:
 def get_openapi_schema(data_type: type, reference=True) -> dict:
     openapi_type = get_openapi_type(data_type)
     if openapi_type == 'object':
+        if issubclass(data_type, marshmallow.Schema):
+            return get_openapi_schema_from_mashmallow_schema(data_type, reference=reference)
         if reference:
             return {'$ref': f'#/components/schemas/{data_type.__name__}'}
         if dataclasses.is_dataclass(data_type):
             return get_openapi_schema_from_dataclass(data_type)
-        if issubclass(data_type, marshmallow.Schema):
-            return get_openapi_schema_from_mashmallow_schema(data_type)
+
     if openapi_type == 'array':
         return get_openapi_array_schema(data_type)
     return {'type': openapi_type}
