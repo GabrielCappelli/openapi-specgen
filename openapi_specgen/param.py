@@ -2,6 +2,9 @@ from .schema import get_openapi_schema
 
 
 class OpenApiParam():
+    '''Object to represent an OpenApi Param as defined on
+    https://swagger.io/docs/specification/describing-parameters/
+    '''
 
     def __init__(self,
                  name: str,
@@ -16,6 +19,10 @@ class OpenApiParam():
         self.required = required
 
     def as_dict(self):
+        '''
+        Returns:
+            dict: dict representing this object as a OpenApi Param.
+        '''
         openapi_dict = {
             'required': self.required,
             'name': self.name,

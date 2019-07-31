@@ -6,6 +6,18 @@ from .schema import get_openapi_schema
 
 
 class OpenApiPath():
+    '''Object to represent an OpenApi Path as defined on
+    https://swagger.io/docs/specification/paths-and-operations/
+
+    Args:
+        path (str): HTTP Path of this api operation, e.g /test. Must start with /.
+        method (str): HTTP method for this path
+        responses (List[OpenApiResponse]): List of all possible OpenApiResponse
+        params (List[OpenApiParam], optional): List of any OpenApiParams. Defaults to [].
+        descr (str, optional): Description of this API operation. Defaults to ''.
+        summary (str, optional): Summary of this API operation. Defaults to ''.
+        request_body ([type], optional): Python type expected in request body. Defaults to None.
+    '''
 
     def __init__(self,
                  path: str,
@@ -25,6 +37,11 @@ class OpenApiPath():
         self.request_body = request_body
 
     def as_dict(self):
+        '''Returns a dict representing this object as a OpenApi Path.
+
+        Returns:
+            dict: dict representing this object as a OpenApi Path.
+        '''
         openapi_dict = {
             self.path: {
                 self.method: {

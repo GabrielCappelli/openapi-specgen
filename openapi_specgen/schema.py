@@ -1,3 +1,6 @@
+'''Functions to help generate OpenApi Schemas as defined on
+https://swagger.io/docs/specification/data-models/
+'''
 import dataclasses
 from typing import List, TypeVar, _GenericAlias
 
@@ -23,7 +26,16 @@ OPENAPI_ARRAY_ITEM_MAP = {
 
 
 def get_openapi_array_schema(array_type: type) -> dict:
+    '''Returns openapi schema of an array
 
+    Use List[T] to specify the type of items in the list
+
+    Args:
+        array_type (type): The type list or List[T]
+
+    Returns:
+        dict: openapi schema of an array
+    '''
     item_type = None
     if isinstance(array_type, _GenericAlias):
         item_type = array_type.__args__[0]
@@ -40,6 +52,17 @@ def get_openapi_array_schema(array_type: type) -> dict:
 
 
 def get_openapi_schema(data_type: type, reference=True) -> dict:
+    '''Returns a dict representing the openapi schema of data_type.
+
+    When referencing assumes objects will be defined in #/components/schemas/.
+
+    Args:
+        data_type (type): Any Python type
+        reference (bool, optional): If true returns only a reference to objects. Defaults to True.
+
+    Returns:
+        dict: dict representing the openapi schema of data_type
+    '''
     openapi_type = get_openapi_type(data_type)
     if openapi_type == 'object':
         if issubclass(data_type, marshmallow.Schema):
@@ -55,6 +78,16 @@ def get_openapi_schema(data_type: type, reference=True) -> dict:
 
 
 def get_openapi_schema_from_dataclass(data_type: type) -> dict:
+    '''Returns a dict representing the openapi schema of the dataclass data_type.
+
+    Assumes all fields declared by this dataclass are required.
+
+    Args:
+        data_type (type): Any dataclass
+
+    Returns:
+        dict: A dict representing this dataclass as a openapi schema
+    '''
     openapi_schema = {
         data_type.__name__: {
             'title': data_type.__name__,
@@ -72,6 +105,14 @@ def get_openapi_schema_from_dataclass(data_type: type) -> dict:
 
 
 def get_openapi_type(data_type: type) -> str:
+    '''Returns data_type`s openapi type equivalent.
+
+    Args:
+        data_type (type): Any python type
+
+    Returns:
+        str: String representation of openapi type
+    '''
     if isinstance(data_type, _GenericAlias):
         if data_type.__origin__ == list:
             return "array"

@@ -5,7 +5,13 @@ from .schema import get_openapi_schema, get_openapi_type
 
 
 class OpenApi():
+    '''Object to represent an OpenApi specification as defined on
+    https://swagger.io/docs/specification/about/
 
+    Args:
+        title (str): Title of your Api
+        paths (List[OpenApiPath]): List of OpenApiPaths that are part of this Api
+    '''
     version = '3.0.2'
     title = None
     paths = None
@@ -13,10 +19,17 @@ class OpenApi():
     def __init__(self,
                  title: str,
                  paths: List[OpenApiPath]):
+        '''
+
+        '''
         self.title = title
         self.paths = paths
 
-    def as_dict(self):
+    def as_dict(self) -> dict:
+        '''
+        Returns:
+            dict: dict representing this object as an OpenApi specification.
+        '''
         openapi_dict = {
             'openapi': self.version,
             'info': {

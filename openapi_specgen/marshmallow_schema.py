@@ -1,8 +1,16 @@
+'''Functions to help generate OpenApi Schemas from Marshmallow schemas'''
 import marshmallow
 
 
 def get_openapi_schema_from_marshmallow_field(marshmallow_field: marshmallow.fields.Field) -> dict:
+    '''Returns openapi schema of marshmallow_field type
 
+    Args:
+        marshmallow_field (marshmallow.fields.Field): Any Field from a Marshmallow schema
+
+    Returns:
+        dict: openapi schema of the given field
+    '''
     if isinstance(marshmallow_field, marshmallow.fields.Nested):
         if isinstance(marshmallow_field.nested, str):
             return {'$ref': f'#/components/schemas/{strip_schema_from_name(marshmallow_field.nested)}'}
@@ -24,6 +32,18 @@ def get_openapi_schema_from_marshmallow_field(marshmallow_field: marshmallow.fie
 
 
 def get_openapi_schema_from_mashmallow_schema(data_type: type, reference=True) -> dict:
+    '''Returns a dict representing the openapi schema of data_type.
+
+    When referencing assumes objects will be defined in #/components/schemas/.
+    Will strip trailing Schema from name.
+
+    Args:
+        data_type (type): A Marshmallow schema
+        reference (bool, optional): If true returns only a reference to objects. Defaults to True.
+
+    Returns:
+        dict: [description]
+    '''
     class_name = strip_schema_from_name(data_type.__name__)
     if reference:
         return {'$ref': f'#/components/schemas/{class_name}'}
