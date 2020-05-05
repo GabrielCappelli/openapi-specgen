@@ -1,7 +1,7 @@
+from datetime import date, datetime
 from typing import List
 
 import pytest
-
 from openapi_specgen.schema import get_openapi_schema
 
 from .utils import (DataclassNestedObject, DataclassObject,
@@ -10,6 +10,8 @@ from .utils import (DataclassNestedObject, DataclassObject,
 
 @pytest.mark.parametrize('data_type, openapi_schema', [
     (str, {'type': 'string'}),
+    (date, {'type': 'string', 'format': 'date'}),
+    (datetime, {'type': 'string', 'format': 'date-time'}),
     (int, {'type': 'integer'}),
     (float, {'type': 'number'}),
     (bool, {'type': 'boolean'}),
@@ -33,20 +35,16 @@ def test_dataclass_schema():
         'DataclassObject': {
             'title': 'DataclassObject',
             'type': 'object',
-            'required':
-            [
-                'str_field',
-                'int_field',
-                'float_field',
-                'boolean_field',
-                'list_field'
-            ],
+            'required': ['str_field', 'int_field', 'float_field',
+                         'boolean_field', 'list_field', 'date_field', 'datetime_field'],
             'properties': {
                 'str_field': {'type': 'string'},
                 'int_field': {'type': 'integer'},
                 'float_field': {'type': 'number'},
                 'boolean_field': {'type': 'boolean'},
-                'list_field': {'type': 'array', 'items': {}}
+                'list_field': {'type': 'array', 'items': {}},
+                'date_field': {'type': 'string', 'format': 'date'},
+                'datetime_field': {'type': 'string', 'format': 'date-time'},
             }
         }
     }
@@ -70,25 +68,17 @@ def test_dataclass_nested_objects():
         },
         'DataclassObject': {
             'title': 'DataclassObject',
-            'required': ['str_field', 'int_field', 'float_field', 'boolean_field', 'list_field'],
+            'required': ['str_field', 'int_field', 'float_field',
+                         'boolean_field', 'list_field', 'date_field', 'datetime_field'],
             'type': 'object',
             'properties': {
-                'str_field': {
-                    'type': 'string'
-                },
-                'int_field': {
-                    'type': 'integer'
-                },
-                'float_field': {
-                    'type': 'number'
-                },
-                'boolean_field': {
-                    'type': 'boolean'
-                },
-                'list_field': {
-                    'type': 'array',
-                    'items': {}
-                }
+                'str_field': {'type': 'string'},
+                'int_field': {'type': 'integer'},
+                'float_field': {'type': 'number'},
+                'boolean_field': {'type': 'boolean'},
+                'list_field': {'type': 'array', 'items': {}},
+                'date_field': {'type': 'string', 'format': 'date'},
+                'datetime_field': {'type': 'string', 'format': 'date-time'},
             }
         }
     }
@@ -109,7 +99,9 @@ def test_marshmallow_schema():
                 'int_field': {'type': 'integer'},
                 'float_field': {'type': 'number'},
                 'boolean_field': {'type': 'boolean'},
-                'list_field': {'type': 'array', 'items': {'type': 'string'}}
+                'list_field': {'type': 'array', 'items': {'type': 'string'}},
+                'date_field': {'type': 'string', 'format': 'date'},
+                'datetime_field': {'type': 'string', 'format': 'date-time'},
             }
         }
     }
@@ -130,7 +122,9 @@ def test_marshmallow_nested_schema():
                 'int_field': {'type': 'integer'},
                 'float_field': {'type': 'number'},
                 'boolean_field': {'type': 'boolean'},
-                'list_field': {'type': 'array', 'items': {'type': 'string'}}
+                'list_field': {'type': 'array', 'items': {'type': 'string'}},
+                'date_field': {'type': 'string', 'format': 'date'},
+                'datetime_field': {'type': 'string', 'format': 'date-time'},
             }
         },
         'MarshmallowNested': {

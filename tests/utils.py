@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import date, datetime
 from typing import List
 
 from marshmallow import Schema, fields
@@ -11,6 +12,8 @@ class DataclassObject():
     float_field: float
     boolean_field: bool
     list_field: List
+    date_field: date
+    datetime_field: datetime
 
 
 @dataclass
@@ -25,6 +28,8 @@ class MarshmallowSchema(Schema):
     float_field = fields.Float()
     boolean_field = fields.Boolean()
     list_field = fields.List(fields.String())
+    date_field = fields.Date()
+    datetime_field = fields.DateTime()
 
 
 class MarshmallowNestedSchema(Schema):

@@ -45,25 +45,17 @@ def test_openapi_with_dataclass():
             'schemas': {
                 'DataclassObject': {
                     'title': 'DataclassObject',
-                    'required': ['str_field', 'int_field', 'float_field', 'boolean_field', 'list_field'],
+                    'required': ['str_field', 'int_field', 'float_field',
+                                 'boolean_field', 'list_field', 'date_field', 'datetime_field'],
                     'type': 'object',
                     'properties': {
-                        'str_field': {
-                            'type': 'string'
-                        },
-                        'int_field': {
-                            'type': 'integer'
-                        },
-                        'float_field': {
-                            'type': 'number'
-                        },
-                        'boolean_field': {
-                            'type': 'boolean'
-                        },
-                        'list_field': {
-                            'type': 'array',
-                            'items': {}
-                        }
+                        'str_field': {'type': 'string'},
+                        'int_field': {'type': 'integer'},
+                        'float_field': {'type': 'number'},
+                        'boolean_field': {'type': 'boolean'},
+                        'list_field': {'type': 'array', 'items': {}},
+                        'date_field': {'type': 'string', 'format': 'date'},
+                        'datetime_field': {'type': 'string', 'format': 'date-time'},
                     }
                 },
                 'DataclassNestedObject': {
@@ -134,22 +126,13 @@ def test_openapi_with_marshmallow():
                     'required': ['str_field'],
                     'type': 'object',
                     'properties': {
-                        'str_field': {
-                            'type': 'string'
-                        },
-                        'int_field': {
-                            'type': 'integer'
-                        },
-                        'float_field': {
-                            'type': 'number'
-                        },
-                        'boolean_field': {
-                            'type': 'boolean'
-                        },
-                        'list_field': {
-                            'type': 'array',
-                            'items': {'type': 'string'}
-                        }
+                        'str_field': {'type': 'string'},
+                        'int_field': {'type': 'integer'},
+                        'float_field': {'type': 'number'},
+                        'boolean_field': {'type': 'boolean'},
+                        'list_field': {'type': 'array', 'items': {'type': 'string'}},
+                        'date_field': {'type': 'string', 'format': 'date'},
+                        'datetime_field': {'type': 'string', 'format': 'date-time'},
                     }
                 }
             }

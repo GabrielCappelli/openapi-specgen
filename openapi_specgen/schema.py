@@ -2,6 +2,7 @@
 https://swagger.io/docs/specification/data-models/
 '''
 import dataclasses
+from datetime import date, datetime
 from typing import List, TypeVar, _GenericAlias
 
 import marshmallow
@@ -10,10 +11,17 @@ from .marshmallow_schema import get_openapi_schema_from_mashmallow_schema
 
 OPENAPI_TYPE_MAP = {
     str: "string",
+    date: "string",
+    datetime: "string",
     float: "number",
     int: "integer",
     bool: "boolean",
     list: "array",
+}
+
+OPENAPI_FORMAT_MAP = {
+    date: "date",
+    datetime: "date-time",
 }
 
 OPENAPI_ARRAY_ITEM_MAP = {
@@ -74,6 +82,10 @@ def get_openapi_schema(data_type: type, reference=True) -> dict:
 
     if openapi_type == 'array':
         return get_openapi_array_schema(data_type)
+
+    openapi_format = get_openapi_format(data_type)
+    if openapi_format:
+        return {'type': openapi_type, 'format': openapi_format}
     return {'type': openapi_type}
 
 
@@ -118,3 +130,16 @@ def get_openapi_type(data_type: type) -> str:
             return "array"
 
     return OPENAPI_TYPE_MAP.get(data_type, "object")
+
+
+def get_openapi_format(data_type: type) -> str:
+    '''Returns the openapi format for this type.
+    More information on https://swagger.io/docs/specification/data-models/data-types/#format
+
+    Args:
+        data_type (type): Any python type
+
+    Returns:
+        str: OpenApi format as a string, None if there isnt any
+    '''
+    return OPENAPI_FORMAT_MAP.get(data_type)

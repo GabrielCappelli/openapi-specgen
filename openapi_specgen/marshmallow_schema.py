@@ -24,6 +24,10 @@ def get_openapi_schema_from_marshmallow_field(marshmallow_field: marshmallow.fie
         return {'type': 'integer'}
     if isinstance(marshmallow_field, marshmallow.fields.Float):
         return {'type': 'number'}
+    if isinstance(marshmallow_field, marshmallow.fields.Date):
+        return {'type': 'string', 'format': 'date'}
+    if isinstance(marshmallow_field, marshmallow.fields.DateTime):
+        return {'type': 'string', 'format': 'date-time'}
     if isinstance(marshmallow_field, marshmallow.fields.List):
         return {
             'type': 'array',
