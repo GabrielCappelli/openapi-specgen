@@ -48,6 +48,12 @@ class OpenApi():
             openapi_dict['paths'][openapi_path.path].update(
                 openapi_path.as_dict()[openapi_path.path])
 
+            if openapi_path.request_body:
+                if get_openapi_type(openapi_path.request_body) == 'object':
+                    openapi_dict['components']['schemas'].update(
+                        get_openapi_schema(openapi_path.request_body, reference=False)
+                    )
+
             for param in openapi_path.params:
                 if get_openapi_type(param.data_type) == 'object':
                     openapi_dict['components']['schemas'].update(
