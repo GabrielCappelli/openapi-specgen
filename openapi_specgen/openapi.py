@@ -1,6 +1,7 @@
 from typing import List
 
 from .path import OpenApiPath
+from .components import ComponentSet
 from .schema import get_openapi_schema, get_openapi_type
 
 
@@ -15,15 +16,18 @@ class OpenApi():
     version = '3.0.2'
     title = None
     paths = None
+    components = None
 
     def __init__(self,
                  title: str,
-                 paths: List[OpenApiPath]):
+                 paths: List[OpenApiPath],
+                 components: ComponentSet):
         '''
 
         '''
         self.title = title
         self.paths = paths
+        self.components = components
 
     def as_dict(self) -> dict:
         '''
@@ -38,9 +42,7 @@ class OpenApi():
             },
             'paths': {
             },
-            'components': {
-                'schemas': {}
-            }
+            'components': self.components.as_dict()
         }
         for openapi_path in self.paths:
             if openapi_dict['paths'].get(openapi_path.path) is None:
