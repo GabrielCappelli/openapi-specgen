@@ -2,6 +2,7 @@
 from openapi_specgen import OpenApi, OpenApiParam, OpenApiPath, OpenApiResponse, ComponentSet
 
 from .utils import DataclassNestedObject, MarshmallowSchema
+from openapi_specgen.components import ApiKeyAuth, BearerAuth
 
 
 def test_openapi_with_dataclass():
@@ -137,12 +138,15 @@ def test_openapi_with_marshmallow():
                     }
                 }
             },
-            'securitySchemes': []
+            'securitySchemes': [
+                {' in': 'header', 'name': 'X-API-Key', 'type': 'apiKey'},
+                {'scheme': 'bearer', 'type': 'http'}
+            ]
         }
     }
 
     test_resp = OpenApiResponse('test_response', data_type=MarshmallowSchema)
     test_param = OpenApiParam('test_param', 'query', data_type=str)
     test_path = OpenApiPath('/test_path', 'get', [test_resp], [test_param])
-    test_api = OpenApi('test_api', [test_path], ComponentSet([]))
+    test_api = OpenApi('test_api', [test_path], ComponentSet([ApiKeyAuth(), BearerAuth()]))
     assert expected_openapi_dict == test_api.as_dict()
