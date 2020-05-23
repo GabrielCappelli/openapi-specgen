@@ -1,7 +1,7 @@
-from typing import List
+from typing import List, Optional
 
 from .path import OpenApiPath
-from .components import ComponentSet
+from .security import OpenApiSecurity
 from .schema import get_openapi_schema, get_openapi_type
 
 
@@ -12,22 +12,23 @@ class OpenApi():
     Args:
         title (str): Title of your Api
         paths (List[OpenApiPath]): List of OpenApiPaths that are part of this Api
+        security Optional[OpenApiSecurity]: Optional OpenApiSecurity defining authentication options for this Api
     '''
     version = '3.0.2'
     title = None
     paths = None
-    components = None
+    security = None
 
     def __init__(self,
                  title: str,
                  paths: List[OpenApiPath],
-                 components: ComponentSet):
+                 security: Optional[OpenApiSecurity] = None):
         '''
 
         '''
         self.title = title
         self.paths = paths
-        self.components = components
+        self.security = security
 
     def as_dict(self) -> dict:
         '''
@@ -42,7 +43,9 @@ class OpenApi():
             },
             'paths': {
             },
-            'components': self.components.as_dict()
+            'components': {
+                'schemas' : {}
+            }
         }
         for openapi_path in self.paths:
             if openapi_dict['paths'].get(openapi_path.path) is None:
@@ -67,5 +70,7 @@ class OpenApi():
                     openapi_dict['components']['schemas'].update(
                         get_openapi_schema(resp.data_type, reference=False)
                     )
+            if self.security:
+                openapi_dict['components']['securitySchemes'] = self.security.as_dict()
 
         return openapi_dict

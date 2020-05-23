@@ -1,8 +1,7 @@
 
-from openapi_specgen import OpenApi, OpenApiParam, OpenApiPath, OpenApiResponse, ComponentSet
+from openapi_specgen import OpenApi, OpenApiParam, OpenApiPath, OpenApiResponse,OpenApiSecurity, ApiKeyAuth, BearerAuth
 
 from .utils import DataclassNestedObject, MarshmallowSchema
-from openapi_specgen.components import ApiKeyAuth, BearerAuth
 
 
 def test_openapi_with_dataclass():
@@ -72,15 +71,15 @@ def test_openapi_with_dataclass():
                         }
                     }
                 }
-            },
-            'securitySchemes': []
+            }
+            
         }
     }
 
     test_resp = OpenApiResponse('test_response', data_type=DataclassNestedObject)
     test_param = OpenApiParam('test_param', 'query', data_type=str)
     test_path = OpenApiPath('/test_path', 'get', [test_resp], [test_param])
-    test_api = OpenApi('test_api', [test_path], ComponentSet([]))
+    test_api = OpenApi('test_api', [test_path])
     assert expected_openapi_dict == test_api.as_dict()
 
 
@@ -138,15 +137,17 @@ def test_openapi_with_marshmallow():
                     }
                 }
             },
-            'securitySchemes': [
-                {' in': 'header', 'name': 'X-API-Key', 'type': 'apiKey'},
-                {'scheme': 'bearer', 'type': 'http'}
-            ]
+            'securitySchemes': {
+                'ApiKeyAuth': {'in': 'header', 'name': 'X-API-Key', 'type': 'apiKey'},
+                'BearerAuth': {'scheme': 'bearer', 'type': 'http'}
+            }
         }
     }
 
     test_resp = OpenApiResponse('test_response', data_type=MarshmallowSchema)
     test_param = OpenApiParam('test_param', 'query', data_type=str)
     test_path = OpenApiPath('/test_path', 'get', [test_resp], [test_param])
-    test_api = OpenApi('test_api', [test_path], ComponentSet([ApiKeyAuth(), BearerAuth()]))
+    test_security = OpenApiSecurity(bearer_auth = BearerAuth(), api_key_auth = ApiKeyAuth() )
+    test_api = OpenApi('test_api', [test_path], security=test_security ) 
+    print(test_api.as_dict())
     assert expected_openapi_dict == test_api.as_dict()
