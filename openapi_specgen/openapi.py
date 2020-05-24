@@ -1,8 +1,8 @@
 from typing import List, Optional
 
 from .path import OpenApiPath
-from .security import OpenApiSecurity
 from .schema import get_openapi_schema, get_openapi_type
+from .security import OpenApiSecurity
 
 
 class OpenApi():
@@ -44,7 +44,7 @@ class OpenApi():
             'paths': {
             },
             'components': {
-                'schemas' : {}
+                'schemas': {}
             }
         }
         for openapi_path in self.paths:
@@ -71,6 +71,7 @@ class OpenApi():
                         get_openapi_schema(resp.data_type, reference=False)
                     )
             if self.security:
+                openapi_dict['security'] = self.security.get_security_reference()
                 openapi_dict['components']['securitySchemes'] = self.security.as_dict()
 
         return openapi_dict
