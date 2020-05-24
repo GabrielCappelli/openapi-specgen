@@ -11,7 +11,7 @@ README = (HERE / "README.md").read_text()
 # This call to setup() does all the work
 setup(
     name="openapi-specgen",
-    version="0.0.5",
+    version="0.0.6",
     description="Generate OpenApi json specification",
     long_description=README,
     long_description_content_type="text/markdown",
@@ -26,6 +26,8 @@ setup(
     ],
     packages=["openapi_specgen"],
     include_package_data=True,
-    install_requires=[],
+    install_requires=[
+        'marshmallow>=3.0.0'
+    ],
     entry_points={}
 )
