@@ -31,7 +31,7 @@ def get_openapi_schema_from_marshmallow_field(marshmallow_field: marshmallow.fie
     if isinstance(marshmallow_field, marshmallow.fields.List):
         return {
             'type': 'array',
-            'items': get_openapi_schema_from_marshmallow_field(marshmallow_field.container)
+            'items': get_openapi_schema_from_marshmallow_field(marshmallow_field.inner)
         }
 
 
