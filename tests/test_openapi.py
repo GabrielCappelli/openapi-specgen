@@ -154,5 +154,4 @@ def test_openapi_with_marshmallow():
     test_path = OpenApiPath('/test_path', 'get', [test_resp], [test_param])
     test_security = OpenApiSecurity(bearer_auth=BearerAuth(), api_key_auth=ApiKeyAuth())
     test_api = OpenApi('test_api', [test_path], security=test_security)
-    print(test_api.as_dict())
     assert expected_openapi_dict == test_api.as_dict()
