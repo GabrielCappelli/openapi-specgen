@@ -1,8 +1,9 @@
 from typing import List
 
+from openapi_specgen.schema import OpenApiSchemaResolver
+
 from .param import OpenApiParam
 from .response import OpenApiResponse
-from .schema import get_openapi_schema
 
 
 class OpenApiPath():
@@ -36,7 +37,7 @@ class OpenApiPath():
         self.descr = descr
         self.request_body = request_body
 
-    def as_dict(self):
+    def as_dict(self, openapi_schema_resolver: OpenApiSchemaResolver):
         '''Returns a dict representing this object as a OpenApi Path.
 
         Returns:
@@ -49,10 +50,10 @@ class OpenApiPath():
                     'summary': self.summary,
                     'operationId': f'[{self.method}]_{self.path}',
                     'responses': {
-                        k: v for response in self.responses for k, v in response.as_dict().items()
+                        k: v for response in self.responses for k, v in response.as_dict(openapi_schema_resolver).items()
                     },
                     'parameters': [
-                        param.as_dict() for param in self.params
+                        param.as_dict(openapi_schema_resolver) for param in self.params
                     ]
                 }
             }
@@ -61,12 +62,8 @@ class OpenApiPath():
             openapi_dict[self.path][self.method]['requestBody'] = {
                 'content': {
                     'application/json': {
-                        'schema': get_openapi_schema(self.request_body)
+                        'schema': openapi_schema_resolver.get_schema(self.request_body)
                     }
                 }
             }
         return openapi_dict
-
-
-
-

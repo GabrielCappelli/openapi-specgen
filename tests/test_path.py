@@ -3,7 +3,7 @@ from openapi_specgen import OpenApiParam, OpenApiPath, OpenApiResponse
 from .utils import MarshmallowSchema
 
 
-def test_path_with_params():
+def test_path_with_params(openapi_schema_resolver):
     expected_openapi_dict = {
         '/test_path': {
             'get': {
@@ -36,10 +36,10 @@ def test_path_with_params():
                                'Test Description',
                                'Test Summary'
                                )
-    assert expected_openapi_dict == openapi_path.as_dict()
+    assert expected_openapi_dict == openapi_path.as_dict(openapi_schema_resolver)
 
 
-def test_path_no_params():
+def test_path_no_params(openapi_schema_resolver):
     expected_openapi_dict = {
         '/test_path': {
             'get': {
@@ -62,10 +62,10 @@ def test_path_no_params():
                                descr='Test Description',
                                summary='Test Summary'
                                )
-    assert expected_openapi_dict == openapi_path.as_dict()
+    assert expected_openapi_dict == openapi_path.as_dict(openapi_schema_resolver)
 
 
-def test_path_with_request_body():
+def test_path_with_request_body(openapi_schema_resolver):
     expected_openapi_dict = {
         '/test_path': {
             'post': {
@@ -98,4 +98,4 @@ def test_path_with_request_body():
                                summary='Test Summary',
                                request_body=MarshmallowSchema
                                )
-    assert expected_openapi_dict == openapi_path.as_dict()
+    assert expected_openapi_dict == openapi_path.as_dict(openapi_schema_resolver)

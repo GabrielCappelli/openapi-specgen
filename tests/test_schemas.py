@@ -2,13 +2,12 @@ from datetime import date, datetime
 from typing import List
 
 import pytest
-from openapi_specgen.schema import get_openapi_schema
 
 from .utils import (DataclassNestedObject, DataclassObject,
                     MarshmallowNestedSchema, MarshmallowSchema)
 
 
-@pytest.mark.parametrize('data_type, openapi_schema', [
+@pytest.mark.parametrize('data_type, expected_schema', [
     (str, {'type': 'string'}),
     (date, {'type': 'string', 'format': 'date'}),
     (datetime, {'type': 'string', 'format': 'date-time'}),
@@ -26,11 +25,11 @@ from .utils import (DataclassNestedObject, DataclassObject,
     (List[float], {'type': 'array', 'items': {'type': 'number'}}),
     (List[bool], {'type': 'array', 'items': {'type': 'boolean'}})
 ])
-def test_openapi_schema(data_type, openapi_schema):
-    assert openapi_schema == get_openapi_schema(data_type)
+def test_openapi_schema(data_type, expected_schema, openapi_schema_resolver):
+    assert expected_schema == openapi_schema_resolver.get_schema(data_type)
 
 
-def test_dataclass_schema():
+def test_dataclass_schema(openapi_schema_resolver):
     expected_openapi_schema = {
         'DataclassObject': {
             'title': 'DataclassObject',
@@ -48,10 +47,11 @@ def test_dataclass_schema():
             }
         }
     }
-    assert expected_openapi_schema == get_openapi_schema(DataclassObject, reference=False)
+    openapi_schema_resolver.get_schema(DataclassObject)
+    assert expected_openapi_schema == openapi_schema_resolver.get_components()
 
 
-def test_dataclass_nested_objects():
+def test_dataclass_nested_objects(openapi_schema_resolver):
     expected_openapi_schema = {
         'DataclassNestedObject': {
             'title': 'DataclassNestedObject',
@@ -82,10 +82,11 @@ def test_dataclass_nested_objects():
             }
         }
     }
-    assert expected_openapi_schema == get_openapi_schema(DataclassNestedObject, reference=False)
+    openapi_schema_resolver.get_schema(DataclassNestedObject)
+    assert expected_openapi_schema == openapi_schema_resolver.get_components()
 
 
-def test_marshmallow_schema():
+def test_marshmallow_schema(openapi_schema_resolver):
     expected_openapi_schema = {
         'Marshmallow': {
             'title': 'Marshmallow',
@@ -105,10 +106,11 @@ def test_marshmallow_schema():
             }
         }
     }
-    assert expected_openapi_schema == get_openapi_schema(MarshmallowSchema, reference=False)
+    openapi_schema_resolver.get_schema(MarshmallowSchema)
+    assert expected_openapi_schema == openapi_schema_resolver.get_components()
 
 
-def test_marshmallow_nested_schema():
+def test_marshmallow_nested_schema(openapi_schema_resolver):
     expected_openapi_schema = {
         'Marshmallow': {
             'title': 'Marshmallow',
@@ -145,4 +147,5 @@ def test_marshmallow_nested_schema():
             }
         }
     }
-    assert expected_openapi_schema == get_openapi_schema(MarshmallowNestedSchema, reference=False)
+    openapi_schema_resolver.get_schema(MarshmallowNestedSchema)
+    assert expected_openapi_schema == openapi_schema_resolver.get_components()

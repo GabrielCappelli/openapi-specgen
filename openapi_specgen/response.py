@@ -1,4 +1,4 @@
-from .schema import get_openapi_schema
+from openapi_specgen.schema import OpenApiSchemaResolver
 
 
 class OpenApiResponse():
@@ -23,7 +23,7 @@ class OpenApiResponse():
         self.status_code = status_code
         self.http_content_type = http_content_type
 
-    def as_dict(self) -> dict:
+    def as_dict(self, openapi_schema: OpenApiSchemaResolver) -> dict:
         '''
         Returns:
             dict: dict representing this object as a OpenApi Response.
@@ -39,7 +39,7 @@ class OpenApiResponse():
 
         openapi_dict[self.status_code]['content'] = {
             self.http_content_type: {
-                'schema': get_openapi_schema(self.data_type)
+                'schema': openapi_schema.get_schema(self.data_type)
             }
         }
 

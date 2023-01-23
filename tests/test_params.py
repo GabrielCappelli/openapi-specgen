@@ -1,10 +1,7 @@
-from typing import List
 
 import pytest
 
 from openapi_specgen import OpenApiParam
-
-from .utils import DataclassObject
 
 
 @pytest.mark.parametrize('location', [
@@ -13,7 +10,7 @@ from .utils import DataclassObject
     ('header'),
     ('cookie')
 ])
-def test_param_location(location):
+def test_param_location(location, openapi_schema_resolver):
     expected_param_dict = {
         'required': True,
         'schema': {
@@ -24,10 +21,10 @@ def test_param_location(location):
         'in': location
     }
     openapi_param = OpenApiParam('test_param', location, str)
-    assert expected_param_dict == openapi_param.as_dict()
+    assert expected_param_dict == openapi_param.as_dict(openapi_schema_resolver)
 
 
-def test_param_optinal():
+def test_param_optinal(openapi_schema_resolver):
     expected_param_dict = {
         'required': False,
         'schema': {
@@ -38,10 +35,10 @@ def test_param_optinal():
         'in': 'path'
     }
     openapi_param = OpenApiParam('test_param', 'path', str, required=False)
-    assert expected_param_dict == openapi_param.as_dict()
+    assert expected_param_dict == openapi_param.as_dict(openapi_schema_resolver)
 
 
-def test_param_default():
+def test_param_default(openapi_schema_resolver):
     expected_param_dict = {
         'required': True,
         'schema': {
@@ -53,10 +50,10 @@ def test_param_default():
         'in': 'path'
     }
     openapi_param = OpenApiParam('test_param', 'path', str, 'default_value')
-    assert expected_param_dict == openapi_param.as_dict()
+    assert expected_param_dict == openapi_param.as_dict(openapi_schema_resolver)
 
 
-def test_param_any_type():
+def test_param_any_type(openapi_schema_resolver):
     expected_param_dict = {
         'required': True,
         'schema': {
@@ -66,7 +63,7 @@ def test_param_any_type():
         'in': 'path'
     }
     openapi_param = OpenApiParam('test_param', 'path')
-    assert expected_param_dict == openapi_param.as_dict()
+    assert expected_param_dict == openapi_param.as_dict(openapi_schema_resolver)
 
 
 @pytest.mark.skip('WIP')

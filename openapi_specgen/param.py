@@ -1,4 +1,4 @@
-from .schema import get_openapi_schema
+from openapi_specgen.schema import OpenApiSchemaResolver
 
 
 class OpenApiParam():
@@ -18,7 +18,7 @@ class OpenApiParam():
         self.default = default
         self.required = required
 
-    def as_dict(self):
+    def as_dict(self, openapi_schema_resolver: OpenApiSchemaResolver):
         '''
         Returns:
             dict: dict representing this object as a OpenApi Param.
@@ -32,7 +32,7 @@ class OpenApiParam():
         schema = {}
 
         if self.data_type is not None:
-            schema = get_openapi_schema(self.data_type)
+            schema = openapi_schema_resolver.get_schema(self.data_type)
         if self.default is not None:
             schema['default'] = self.default
 

@@ -2,144 +2,97 @@
 https://swagger.io/docs/specification/data-models/
 '''
 import dataclasses
-from datetime import date, datetime
-from typing import List, TypeVar, _GenericAlias
+import datetime
+import inspect
+import typing
 
-import marshmallow
+from openapi_specgen.marshmallow_schema import resolve_marshmallow
 
-from .marshmallow_schema import get_openapi_schema_from_mashmallow_schema
-
-OPENAPI_TYPE_MAP = {
+OPENAPI_TYPE_MAP: typing.Dict[type, str] = {
     str: "string",
-    date: "string",
-    datetime: "string",
+    datetime.date: "string",
+    datetime.datetime: "string",
     float: "number",
     int: "integer",
     bool: "boolean",
-    list: "array",
 }
 
-OPENAPI_FORMAT_MAP = {
-    date: "date",
-    datetime: "date-time",
-}
-
-OPENAPI_ARRAY_ITEM_MAP = {
-    List[str]: "string",
-    List[float]: "number",
-    List[int]: "integer",
-    List[bool]: "boolean",
-    List: None
+OPENAPI_FORMAT_MAP: typing.Dict[type, str] = {
+    datetime.date: "date",
+    datetime.datetime: "date-time",
 }
 
 
-def get_openapi_array_schema(array_type: type) -> dict:
-    '''Returns openapi schema of an array
+def resolve_basic(openapi_schema_resolver: "OpenApiSchemaResolver", data_type: type):
+    openapi_type = OPENAPI_TYPE_MAP.get(data_type)
+    openapi_format = OPENAPI_FORMAT_MAP.get(data_type)
 
-    Use List[T] to specify the type of items in the list
+    if openapi_type and openapi_format:
+        return {"type": openapi_type, "format": openapi_format}
 
-    Args:
-        array_type (type): The type list or List[T]
-
-    Returns:
-        dict: openapi schema of an array
-    '''
-    item_type = None
-    if isinstance(array_type, _GenericAlias):
-        item_type = array_type.__args__[0]
-
-    if item_type is None or isinstance(item_type, TypeVar):
-        return {
-            'type': 'array',
-            'items': {}
-        }
-    return {
-        'type': 'array',
-        'items': get_openapi_schema(item_type)
-    }
+    if openapi_type:
+        return {"type": openapi_type}
 
 
-def get_openapi_schema(data_type: type, reference=True) -> dict:
-    '''Returns a dict representing the openapi schema of data_type.
+def resolve_array(openapi_schema_resolver: "OpenApiSchemaResolver", data_type: type):
+    items = typing.get_args(data_type)
+    data_type = typing.get_origin(data_type) or data_type
 
-    When referencing assumes objects will be defined in #/components/schemas/.
+    if not inspect.isclass(data_type) or not issubclass(data_type, typing.Iterable):
+        return
 
-    Args:
-        data_type (type): Any Python type
-        reference (bool, optional): If true returns only a reference to objects. Defaults to True.
-
-    Returns:
-        dict: dict representing the openapi schema of data_type
-    '''
-    openapi_type = get_openapi_type(data_type)
-    if openapi_type == 'object':
-        if issubclass(data_type, marshmallow.Schema):
-            return get_openapi_schema_from_mashmallow_schema(data_type, reference=reference)
-        if reference:
-            return {'$ref': f'#/components/schemas/{data_type.__name__}'}
-        if dataclasses.is_dataclass(data_type):
-            return get_openapi_schema_from_dataclass(data_type)
-
-    if openapi_type == 'array':
-        return get_openapi_array_schema(data_type)
-
-    openapi_format = get_openapi_format(data_type)
-    if openapi_format:
-        return {'type': openapi_type, 'format': openapi_format}
-    return {'type': openapi_type}
+    if items:
+        return {"type": "array", "items": openapi_schema_resolver.get_schema(items[0])}
+    return {"type": "array", "items": {}}
 
 
-def get_openapi_schema_from_dataclass(data_type: type) -> dict:
-    '''Returns a dict representing the openapi schema of the dataclass data_type.
+def resolve_dataclass(openapi_schema_resolver: "OpenApiSchemaResolver", data_type: type):
 
-    Assumes all fields declared by this dataclass are required.
+    if not dataclasses.is_dataclass(data_type):
+        return
 
-    Args:
-        data_type (type): Any dataclass
+    component_name = data_type.__name__
 
-    Returns:
-        dict: A dict representing this dataclass as a openapi schema
-    '''
-    openapi_schema = {
-        data_type.__name__: {
-            'title': data_type.__name__,
+    openapi_schema_resolver.add_component(
+        component_name,
+        {
+            'title': component_name,
             'required': [field.name for field in dataclasses.fields(data_type)],
             'type': 'object',
             'properties': {
-                field.name: get_openapi_schema(field.type) for field in dataclasses.fields(data_type)
+                field.name: openapi_schema_resolver.get_schema(field.type) for field in dataclasses.fields(data_type)
             }
         }
-    }
-    for field in dataclasses.fields(data_type):
-        if get_openapi_type(field.type) == 'object':
-            openapi_schema.update(get_openapi_schema(field.type, reference=False))
-    return openapi_schema
+    )
+
+    return {'$ref': openapi_schema_resolver.get_component_ref(component_name)}
 
 
-def get_openapi_type(data_type: type) -> str:
-    '''Returns data_type`s openapi type equivalent.
+class OpenApiSchemaResolver:
+    """
+    Resolve python types into OpenApi schemas
+    """
 
-    Args:
-        data_type (type): Any python type
+    def __init__(self) -> None:
+        self.resolvers = [
+            resolve_basic,
+            resolve_array,
+            resolve_dataclass,
+            resolve_marshmallow,
+        ]
+        self.components = {}
 
-    Returns:
-        str: String representation of openapi type
-    '''
-    if isinstance(data_type, _GenericAlias):
-        if data_type.__origin__ == list:
-            return "array"
+    def get_schema(self, data_type: type) -> typing.Dict[str, typing.Any]:
+        for resolver in self.resolvers:
+            if result := resolver(self, data_type):
+                return result
+        raise ValueError(f"Cannot resolve OpenApi schema for {data_type}")
 
-    return OPENAPI_TYPE_MAP.get(data_type, "object")
+    def get_component_ref(self, component_name: str) -> str:
+        return f'#/components/schemas/{component_name}'
 
+    def add_component(self, component_name: str, component_dict: typing.Dict[str, typing.Any]):
+        self.components[component_name] = component_dict
 
-def get_openapi_format(data_type: type) -> str:
-    '''Returns the openapi format for this type.
-    More information on https://swagger.io/docs/specification/data-models/data-types/#format
-
-    Args:
-        data_type (type): Any python type
-
-    Returns:
-        str: OpenApi format as a string, None if there isnt any
-    '''
-    return OPENAPI_FORMAT_MAP.get(data_type)
+    def get_components(self) -> typing.Dict[str, typing.Any]:
+        return self.components
