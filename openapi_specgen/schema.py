@@ -46,6 +46,18 @@ def resolve_array(openapi_schema_resolver: "OpenApiSchemaResolver", data_type: t
     return {"type": "array", "items": {}}
 
 
+def resolve_mapping(openapi_schema_resolver: "OpenApiSchemaResolver", data_type: type):
+    items = typing.get_args(data_type)
+    data_type = typing.get_origin(data_type) or data_type
+
+    if not inspect.isclass(data_type) or not issubclass(data_type, typing.Mapping):
+        return
+
+    if items:
+        return {"type": "object", "additionalProperties": openapi_schema_resolver.get_schema(items[1])}
+    return {"type": "object", "additionalProperties": {}}
+
+
 def resolve_dataclass(openapi_schema_resolver: "OpenApiSchemaResolver", data_type: type):
 
     if not dataclasses.is_dataclass(data_type):
@@ -77,6 +89,7 @@ class OpenApiSchemaResolver:
         self.resolvers = [
             resolve_basic,
             resolve_array,
+            resolve_mapping,
             resolve_dataclass,
             resolve_marshmallow,
         ]

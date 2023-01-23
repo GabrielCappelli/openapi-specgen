@@ -1,5 +1,5 @@
 from datetime import date, datetime
-from typing import List
+from typing import Dict, List
 
 import pytest
 
@@ -23,7 +23,16 @@ from .utils import (DataclassNestedObject, DataclassObject,
     (List[str], {'type': 'array', 'items': {'type': 'string'}}),
     (List[int], {'type': 'array', 'items': {'type': 'integer'}}),
     (List[float], {'type': 'array', 'items': {'type': 'number'}}),
-    (List[bool], {'type': 'array', 'items': {'type': 'boolean'}})
+    (List[bool], {'type': 'array', 'items': {'type': 'boolean'}}),
+    (Dict, {'type': 'object', 'additionalProperties': {}}),
+    (
+        Dict[str, DataclassObject],
+        {'type': 'object', 'additionalProperties': {'$ref': '#/components/schemas/DataclassObject'}}
+    ),
+    (Dict[str, str], {'type': 'object', 'additionalProperties': {'type': 'string'}}),
+    (Dict[str, int], {'type': 'object', 'additionalProperties': {'type': 'integer'}}),
+    (Dict[str, float], {'type': 'object', 'additionalProperties': {'type': 'number'}}),
+    (Dict[str, bool], {'type': 'object', 'additionalProperties': {'type': 'boolean'}})
 ])
 def test_openapi_schema(data_type, expected_schema, openapi_schema_resolver):
     assert expected_schema == openapi_schema_resolver.get_schema(data_type)
