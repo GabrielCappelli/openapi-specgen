@@ -38,7 +38,7 @@ def resolve_array(openapi_schema_resolver: "OpenApiSchemaResolver", data_type: t
     items = typing.get_args(data_type)
     data_type = typing.get_origin(data_type) or data_type
 
-    if not inspect.isclass(data_type) or not issubclass(data_type, typing.Iterable):
+    if not inspect.isclass(data_type) or not issubclass(data_type, typing.Sequence):
         return
 
     if items:
