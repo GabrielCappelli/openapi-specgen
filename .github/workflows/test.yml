@@ -19,7 +19,6 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install Dependencies
-        run: pip install -r requirements-dev.txt
-        run: pip install marshmallow==3.19.0
+        run: pip install marshmallow==3.19.0 pytest==5.0.1 pytest-cov==2.7.1
       - name: Test
         run: pytest 
