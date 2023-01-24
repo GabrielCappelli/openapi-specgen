@@ -1,5 +1,5 @@
 from datetime import date, datetime
-from typing import Dict, List
+from typing import Any, Dict, List
 
 import pytest
 
@@ -36,6 +36,14 @@ from .utils import (DataclassNestedObject, DataclassObject,
 ])
 def test_openapi_schema(data_type, expected_schema, openapi_schema_resolver):
     assert expected_schema == openapi_schema_resolver.get_schema(data_type)
+
+
+def test_any(openapi_schema_resolver):
+    expected_schema = {'$ref': '#/components/schemas/AnyValue'}
+    assert expected_schema == openapi_schema_resolver.get_schema(Any)
+
+    expected_components = {"AnyValue": {}}
+    assert expected_components == openapi_schema_resolver.get_components()
 
 
 def test_dataclass_schema(openapi_schema_resolver):

@@ -80,6 +80,18 @@ def resolve_dataclass(openapi_schema_resolver: "OpenApiSchemaResolver", data_typ
     return {'$ref': openapi_schema_resolver.get_component_ref(component_name)}
 
 
+def resolve_any(openapi_schema_resolver: "OpenApiSchemaResolver", data_type: type):
+    if data_type is not typing.Any:
+        return
+
+    openapi_schema_resolver.add_component(
+        "AnyValue",
+        {}
+    )
+
+    return {"$ref": openapi_schema_resolver.get_component_ref("AnyValue")}
+
+
 class OpenApiSchemaResolver:
     """
     Resolve python types into OpenApi schemas
@@ -92,6 +104,7 @@ class OpenApiSchemaResolver:
             resolve_mapping,
             resolve_dataclass,
             resolve_marshmallow,
+            resolve_any,
         ]
         self.components = {}
 
