@@ -1,3 +1,4 @@
+import sys
 from datetime import date, datetime
 from typing import Any, Dict, List
 
@@ -38,6 +39,31 @@ from .utils import (DataclassNestedObject, DataclassObject,
 ])
 def test_openapi_schema(data_type, expected_schema, openapi_schema_resolver):
     assert expected_schema == openapi_schema_resolver.get_schema(data_type)
+
+
+if sys.version_info >= (3, 9):
+    @pytest.mark.parametrize('data_type, expected_schema', [
+        (list, {'type': 'array', 'items': {}}),
+        (
+            List[DataclassObject],
+            {'type': 'array', 'items': {'$ref': '#/components/schemas/DataclassObject'}}
+        ),
+        (list[str], {'type': 'array', 'items': {'type': 'string'}}),
+        (list[int], {'type': 'array', 'items': {'type': 'integer'}}),
+        (list[float], {'type': 'array', 'items': {'type': 'number'}}),
+        (list[bool], {'type': 'array', 'items': {'type': 'boolean'}}),
+        (dict, {'type': 'object', 'additionalProperties': {}}),
+        (
+            dict[str, DataclassObject],
+            {'type': 'object', 'additionalProperties': {'$ref': '#/components/schemas/DataclassObject'}}
+        ),
+        (dict[str, str], {'type': 'object', 'additionalProperties': {'type': 'string'}}),
+        (dict[str, int], {'type': 'object', 'additionalProperties': {'type': 'integer'}}),
+        (dict[str, float], {'type': 'object', 'additionalProperties': {'type': 'number'}}),
+        (dict[str, bool], {'type': 'object', 'additionalProperties': {'type': 'boolean'}})
+    ])
+    def test_openapi_schema_py39(data_type, expected_schema, openapi_schema_resolver):
+        assert expected_schema == openapi_schema_resolver.get_schema(data_type)
 
 
 def test_any(openapi_schema_resolver):
