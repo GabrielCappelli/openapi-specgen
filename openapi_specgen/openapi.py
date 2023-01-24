@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from openapi_specgen.schema import OpenApiSchemaResolver
+from openapi_specgen.schema import OpenApiSchemaResolver, ResolverProto
 
 from .path import OpenApiPath
 from .security import OpenApiSecurity
@@ -33,6 +33,12 @@ class OpenApi():
         self.paths = paths
         self.security = security
         self.openapi_schema_resolver = schema_resolver or OpenApiSchemaResolver()
+
+    def add_resolver(self, resolver: ResolverProto):
+        self.openapi_schema_resolver.add_resolver(resolver)
+
+    def remove_resolver(self, resolver: ResolverProto):
+        self.openapi_schema_resolver.remove_resolver(resolver)
 
     def as_dict(self) -> dict:
         '''

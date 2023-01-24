@@ -3,6 +3,8 @@ from typing import Any, Dict, List
 
 import pytest
 
+from openapi_specgen.schema import resolve_dataclass
+
 from .utils import (DataclassNestedObject, DataclassObject,
                     MarshmallowNestedSchema, MarshmallowSchema)
 
@@ -166,3 +168,21 @@ def test_marshmallow_nested_schema(openapi_schema_resolver):
     }
     openapi_schema_resolver.get_schema(MarshmallowNestedSchema)
     assert expected_openapi_schema == openapi_schema_resolver.get_components()
+
+
+def test_add_resolver(openapi_schema_resolver):
+
+    class CustomType:
+        pass
+
+    def custom_type_resolver(openapi_schema_resolver, data_type):
+        return {'type': 'foo'}
+
+    openapi_schema_resolver.add_resolver(custom_type_resolver)
+    assert {'type': 'foo'} == openapi_schema_resolver.get_schema(CustomType)
+
+
+def test_remove_resolver(openapi_schema_resolver):
+    openapi_schema_resolver.remove_resolver(resolve_dataclass)
+    with pytest.raises(ValueError):
+        openapi_schema_resolver.get_schema(DataclassObject)

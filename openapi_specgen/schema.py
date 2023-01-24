@@ -92,13 +92,23 @@ def resolve_any(openapi_schema_resolver: "OpenApiSchemaResolver", data_type: typ
     return {"$ref": openapi_schema_resolver.get_component_ref("AnyValue")}
 
 
+class ResolverProto(typing.Protocol):
+
+    def __call__(
+        self,
+        openapi_schema_resolver: "OpenApiSchemaResolver",
+        data_type: type
+    ) -> typing.Union[typing.Dict[str, typing.Any], None]:
+        ...
+
+
 class OpenApiSchemaResolver:
     """
     Resolve python types into OpenApi schemas
     """
 
     def __init__(self) -> None:
-        self.resolvers = [
+        self._resolvers: typing.List[ResolverProto] = [
             resolve_basic,
             resolve_array,
             resolve_mapping,
@@ -106,10 +116,10 @@ class OpenApiSchemaResolver:
             resolve_marshmallow,
             resolve_any,
         ]
-        self.components = {}
+        self._components = {}
 
     def get_schema(self, data_type: type) -> typing.Dict[str, typing.Any]:
-        for resolver in self.resolvers:
+        for resolver in self._resolvers:
             if result := resolver(self, data_type):
                 return result
         raise ValueError(f"Cannot resolve OpenApi schema for {data_type}")
@@ -118,7 +128,13 @@ class OpenApiSchemaResolver:
         return f'#/components/schemas/{component_name}'
 
     def add_component(self, component_name: str, component_dict: typing.Dict[str, typing.Any]):
-        self.components[component_name] = component_dict
+        self._components[component_name] = component_dict
 
     def get_components(self) -> typing.Dict[str, typing.Any]:
-        return self.components
+        return self._components
+
+    def add_resolver(self, resolver: ResolverProto):
+        self._resolvers.append(resolver)
+
+    def remove_resolver(self, resolver: ResolverProto):
+        self._resolvers.remove(resolver)

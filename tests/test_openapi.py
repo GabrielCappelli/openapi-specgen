@@ -1,6 +1,9 @@
 
+from unittest.mock import create_autospec
+
 from openapi_specgen import (ApiKeyAuth, BearerAuth, OpenApi, OpenApiParam,
                              OpenApiPath, OpenApiResponse, OpenApiSecurity)
+from openapi_specgen.schema import OpenApiSchemaResolver
 
 from .utils import DataclassNestedObject, MarshmallowSchema
 
@@ -155,3 +158,21 @@ def test_openapi_with_marshmallow():
     test_security = OpenApiSecurity(bearer_auth=BearerAuth(), api_key_auth=ApiKeyAuth())
     test_api = OpenApi('test_api', [test_path], security=test_security)
     assert expected_openapi_dict == test_api.as_dict()
+
+
+def test_add_resolver():
+    schema_resolver_mock = create_autospec(OpenApiSchemaResolver)
+
+    openapi = OpenApi("test_api", [], schema_resolver=schema_resolver_mock)
+
+    openapi.add_resolver("foo")
+    schema_resolver_mock.add_resolver.assert_called_with("foo")
+
+
+def test_remove_resolver():
+    schema_resolver_mock = create_autospec(OpenApiSchemaResolver)
+
+    openapi = OpenApi("test_api", [], schema_resolver=schema_resolver_mock)
+
+    openapi.remove_resolver("foo")
+    schema_resolver_mock.remove_resolver.assert_called_with("foo")

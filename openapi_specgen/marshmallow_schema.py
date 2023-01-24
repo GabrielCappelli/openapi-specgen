@@ -56,7 +56,7 @@ def resolve_marshmallow(openapi_schema_resolver, data_type: type):
     component_name = strip_schema_from_name(data_type.__name__)
 
     # Avoids infinite recursion on circular or self references
-    if component_name in openapi_schema_resolver.components:
+    if component_name in openapi_schema_resolver.get_components():
         return {"$ref": openapi_schema_resolver.get_component_ref(component_name)}
 
     component = {
