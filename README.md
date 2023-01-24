@@ -1,3 +1,5 @@
+[![Test](https://github.com/GabrielCappelli/openapi-specgen/actions/workflows/test.yml/badge.svg)](https://github.com/GabrielCappelli/openapi-specgen/actions/workflows/test.yml)
+
 # openapi-specgen
 Openapi-Specgen helps you generate [OpenApi specification](https://swagger.io/docs/specification/about/) from your python code.
 
