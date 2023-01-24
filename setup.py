@@ -26,8 +26,9 @@ setup(
     ],
     packages=["openapi_specgen"],
     include_package_data=True,
-    install_requires=[
-        'marshmallow>=3.0.0'
-    ],
+    install_requires=[],
+    extras_require={
+        "marshmallow": ["marshmallow>=3.0.0"],
+    },
     entry_points={}
 )

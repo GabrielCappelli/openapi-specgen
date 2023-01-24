@@ -6,7 +6,10 @@ import datetime
 import inspect
 import typing
 
-from openapi_specgen.marshmallow_schema import resolve_marshmallow
+try:
+    from openapi_specgen.marshmallow_schema import resolve_marshmallow
+except ImportError:
+    resolve_marshmallow = None
 
 OPENAPI_TYPE_MAP: typing.Dict[type, str] = {
     str: "string",
@@ -113,9 +116,10 @@ class OpenApiSchemaResolver:
             resolve_array,
             resolve_mapping,
             resolve_dataclass,
-            resolve_marshmallow,
             resolve_any,
         ]
+        if resolve_marshmallow is not None:
+            self.add_resolver(resolve_marshmallow)
         self._components = {}
 
     def get_schema(self, data_type: type) -> typing.Dict[str, typing.Any]:
