@@ -3,6 +3,7 @@ https://swagger.io/docs/specification/data-models/
 '''
 import dataclasses
 import datetime
+import enum
 import inspect
 import typing
 
@@ -18,6 +19,8 @@ OPENAPI_TYPE_MAP: typing.Dict[type, str] = {
     float: "number",
     int: "integer",
     bool: "boolean",
+    enum.IntEnum: "integer",
+    enum.Enum: "string"
 }
 
 OPENAPI_FORMAT_MAP: typing.Dict[type, str] = {
@@ -95,6 +98,15 @@ def resolve_any(openapi_schema_resolver: "OpenApiSchemaResolver", data_type: typ
     return {"$ref": openapi_schema_resolver.get_component_ref("AnyValue")}
 
 
+def resolve_enum(openapi_schema_resolver: "OpenApiSchemaResolver", data_type: type):
+    if not isinstance(data_type, enum.EnumMeta):
+        return
+
+    openapi_type = OPENAPI_TYPE_MAP.get(data_type.__base__)
+
+    return {"type": openapi_type}
+
+
 class ResolverProto(typing.Protocol):
 
     def __call__(
@@ -113,6 +125,7 @@ class OpenApiSchemaResolver:
     def __init__(self) -> None:
         self._resolvers: typing.List[ResolverProto] = [
             resolve_basic,
+            resolve_enum,
             resolve_array,
             resolve_mapping,
             resolve_dataclass,
